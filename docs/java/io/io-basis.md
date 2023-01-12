@@ -149,7 +149,7 @@ dataOutputStream.writeBoolean(true);
 dataOutputStream.writeByte(1);
 ```
 
-`ObjectOutputStream` 用于从输入流中读取 Java 对象（`ObjectInputStream`,反序列化）或者将对象写入到输出流(`ObjectOutputStream`，序列化)。
+`ObjectInputStream` 用于从输入流中读取 Java 对象（`ObjectInputStream`,反序列化），`ObjectOutputStream`将对象写入到输出流(`ObjectOutputStream`，序列化)。
 
 ```java
 ObjectOutputStream output = new ObjectOutputStream(new FileOutputStream("file.txt")
@@ -194,7 +194,7 @@ The content read from file:§å®¶å¥½
 
 - `read()` : 从输入流读取一个字符。
 - `read(char[] cbuf)` : 从输入流中读取一些字符，并将它们存储到字符数组 `cbuf`中，等价于 `read(cbuf, 0, cbuf.length)` 。
-- `read(char[] cbuf, int off, int len)` ：在`read(char[] cbuf)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字节数）。
+- `read(char[] cbuf, int off, int len)` ：在`read(char[] cbuf)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字符数）。
 - `skip(long n)` ：忽略输入流中的 n 个字符 ,返回实际忽略的字符数。
 - `close()` : 关闭输入流并释放相关的系统资源。
 
@@ -244,9 +244,9 @@ The content read from file:我是Guide。
 
 - `write(int c)` : 写入单个字符。
 - `write(char[] cbuf)` ：写入字符数组 `cbuf`，等价于`write(cbuf, 0, cbuf.length)`。
-- `write(char[] cbuf, int off, int len)` ：在`write(char[] cbuf)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字节数）。
+- `write(char[] cbuf, int off, int len)` ：在`write(char[] cbuf)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字符数）。
 - `write(String str)` ：写入字符串，等价于 `write(str, 0, str.length())` 。
-- `write(String str, int off, int len)` ：在`write(String str)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字节数）。
+- `write(String str, int off, int len)` ：在`write(String str)` 方法的基础上增加了 `off` 参数（偏移量）和 `len` 参数（要读取的最大字符数）。
 - `append(CharSequence csq)` ：将指定的字符序列附加到指定的 `Writer` 对象并返回该 `Writer` 对象。
 - `append(char c)` ：将指定的字符附加到指定的 `Writer` 对象并返回该 `Writer` 对象。
 - `flush()` ：刷新此输出流并强制写出所有缓冲的输出字符。
@@ -256,7 +256,7 @@ The content read from file:我是Guide。
 
 ```java
 // 字符流转换为字节流的桥梁
-public class InputStreamReader extends Reader {
+public class OutputStreamWriter extends Writer {
 }
 // 用于写入字符到文件
 public class FileWriter extends OutputStreamWriter {

@@ -142,8 +142,8 @@ public int compare(Integer o1, Integer o2) {
 //Lambda
 Collections.sort(strings, (Integer o1, Integer o2) -> o1 - o2);
 //分解开
-Comparator<Integer> comperator = (Integer o1, Integer o2) -> o1 - o2;
-Collections.sort(strings, comperator);
+Comparator<Integer> comparator = (Integer o1, Integer o2) -> o1 - o2;
+Collections.sort(strings, comparator);
 ```
 
 **3.`Listener` 接口**
@@ -186,7 +186,7 @@ public class LambdaClass {
     }
     //函数式接口参数
     static void lambdaInterfaceDemo(LambdaInterface i){
-        System.out.println(i);
+        i.f();
     }
 }
 ```
@@ -766,8 +766,8 @@ LocalTime.class //时间 format: HH:mm:ss
 
 ```java
 public void oldFormat(){
-		Date now = new Date();
-    //format yyyy-MM-dd HH:mm:ss
+    Date now = new Date();
+    //format yyyy-MM-dd
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
     String date  = sdf.format(now);
     System.out.println(String.format("date format : %s", date));
@@ -854,8 +854,8 @@ public void afterDay(){
      Date date1 = format.parse(dates1);
      Date date2 = format.parse(dates2);
      int day = (int) ((date1.getTime() - date2.getTime()) / (1000 * 3600 * 24));
-     System.out.println(dates2 + "和" + dates2 + "相差" + day + "天");
-     //结果：2021-12-23和2021-12-23相差300天
+     System.out.println(dates1 + "和" + dates2 + "相差" + day + "天");
+     //结果：2021-02-26和2021-12-23相差300天
 }
 ```
 
@@ -883,8 +883,8 @@ public void pushWeek(){
      //这里period.getDays()得到的天是抛去年月以外的天数，并不是总天数
      //如果要获取纯粹的总天数应该用下面的方法
      long day = date2.toEpochDay() - date1.toEpochDay();
-     System.out.println(date2 + "和" + date2 + "相差" + day + "天");
-     //打印结果：2021-12-23和2021-12-23相差300天
+     System.out.println(date1 + "和" + date2 + "相差" + day + "天");
+     //打印结果：2021-02-26和2021-12-23相差300天
 }
 ```
 

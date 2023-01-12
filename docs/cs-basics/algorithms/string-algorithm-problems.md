@@ -5,10 +5,9 @@ tag:
   - 算法
 ---
 
-> 授权转载！
+> 作者：wwwxmu
 >
-> - 本文作者：wwwxmu
-> - 原文地址:https://www.weiweiblog.cn/13string/
+> 原文地址:https://www.weiweiblog.cn/13string/
 
 
 ## 1. KMP 算法
@@ -129,7 +128,7 @@ public class Main {
 
 	}
 
-	private static boolean chechStrs(String[] strs) {
+	private static boolean checkStrs(String[] strs) {
 		boolean flag = false;
 		if (strs != null) {
 			// 遍历strs检查元素值

@@ -21,21 +21,21 @@ Redis 可以通过 **`MULTI`，`EXEC`，`DISCARD` 和 `WATCH`** 等命令来实�
 ```bash
 > MULTI
 OK
-> SET USER "Guide哥"
+> SET PROJECT "JavaGuide"
 QUEUED
-> GET USER
+> GET PROJECT
 QUEUED
 > EXEC
 1) OK
-2) "Guide哥"
+2) "JavaGuide"
 ```
 
-使用 [`MULTI`](https://redis.io/commands/multi) 命令后可以输入多个命令。Redis 不会立即执行这些命令，而是将它们放到队列，当调用了 [`EXEC`](https://redis.io/commands/exec) 命令将执行所有命令。
+ [`MULTI`](https://redis.io/commands/multi) 命令后可以输入多个命令，Redis 不会立即执行这些命令，而是将它们放到队列，当调用了 [`EXEC`](https://redis.io/commands/exec) 命令后，再执行所有的命令。
 
 这个过程是这样的：
 
-1. 开始事务（`MULTI`）。
-2. 命令入队(批量操作 Redis 的命令，先进先出（FIFO）的顺序执行)。
+1. 开始事务（`MULTI`）；
+2. 命令入队(批量操作 Redis 的命令，先进先出（FIFO）的顺序执行)；
 3. 执行事务(`EXEC`)。
 
 你也可以通过 [`DISCARD`](https://redis.io/commands/discard) 命令取消一个事务，它会清空事务队列中保存的所有命令。
@@ -43,31 +43,84 @@ QUEUED
 ```bash
 > MULTI
 OK
-> SET USER "Guide哥"
+> SET PROJECT "JavaGuide"
 QUEUED
-> GET USER
+> GET PROJECT
 QUEUED
 > DISCARD
 OK
 ```
 
-[`WATCH`](https://redis.io/commands/watch) 命令用于监听指定的键，当调用 `EXEC` 命令执行事务时，如果一个被 `WATCH` 命令监视的键被修改的话，整个事务都不会执行，直接返回失败。
+你可以通过[`WATCH`](https://redis.io/commands/watch) 命令监听指定的 Key，当调用 `EXEC` 命令执行事务时，如果一个被 `WATCH` 命令监视的 Key 被 **其他客户端/Session** 修改的话，整个事务都不会被执行。
 
 ```bash
-> WATCH USER
+# 客户端 1
+> SET PROJECT "RustGuide"
+OK
+> WATCH PROJECT
 OK
 > MULTI
-> SET USER "Guide哥"
+OK
+> SET PROJECT "JavaGuide"
+QUEUED
+
+# 客户端 2
+# 在客户端 1 执行 EXEC 命令提交事务之前修改 PROJECT 的值
+> SET PROJECT "GoGuide"
+
+# 客户端 1
+# 修改失败，因为 PROJECT 的值被客户端2修改了
+> EXEC
+(nil)
+> GET PROJECT
+"GoGuide"
+```
+
+不过，如果 **WATCH** 与 **事务** 在同一个 Session 里，并且被 **WATCH** 监视的 Key 被修改的操作发生在事务内部，这个事务是可以被执行成功的（相关 issue ：[WATCH 命令碰到 MULTI 命令时的不同效果](https://github.com/Snailclimb/JavaGuide/issues/1714)）。
+
+事务内部修改 WATCH 监视的 Key：
+
+```bash
+> SET PROJECT "JavaGuide"
+OK
+> WATCH PROJECT
+OK
+> MULTI
+OK
+> SET PROJECT "JavaGuide1"
+QUEUED
+> SET PROJECT "JavaGuide2"
+QUEUED
+> SET PROJECT "JavaGuide3"
+QUEUED
+> EXEC
+1) OK
+2) OK
+3) OK
+127.0.0.1:6379> GET PROJECT
+"JavaGuide3"
+```
+
+事务外部修改 WATCH 监视的 Key：
+
+```bash
+> SET PROJECT "JavaGuide"
+OK
+> WATCH PROJECT
+OK
+> SET PROJECT "JavaGuide2"
+OK
+> MULTI
 OK
 > GET USER
-Guide哥
+QUEUED
 > EXEC
-ERR EXEC without MULTI
+(nil)
 ```
 
 Redis 官网相关介绍 [https://redis.io/topics/transactions](https://redis.io/topics/transactions) 如下：
 
-![redis事务](./images/redis-all/redis事务.png)
+![Redis 事务](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-transactions.png)
 
 ### Redis 支持原子性吗？
 
@@ -82,7 +135,7 @@ Redis 事务在运行错误的情况下，除了执行过程中出现错误的�
 
 Redis 官网也解释了自己为啥不支持回滚。简单来说就是 Redis 开发者们觉得没必要支持回滚，这样更简单便捷并且性能更好。Redis 开发者觉得即使命令执行错误也应该在开发过程中就被发现而不是生产过程中。
 
-![redis roll back](./images/redis-all/redis-rollBack.png)
+![Redis 为什么不支持回滚](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-rollback.png)
 
 你可以将 Redis 中的事务就理解为 ：**Redis 事务提供了一种将多个命令请求打包的功能。然后，再按顺序执行打包的所有命令，并且不会被中途打断。**
 
@@ -179,13 +232,11 @@ Biggest string found '"ballcat:oauth:refresh_auth:f6cdb384-9a9d-4f2f-af01-dc3f28
 
 #### 什么是缓存穿透？
 
-缓存穿透说简单点就是大量请求的 key 根本不存在于缓存中，导致请求直接到了数据库上，根本没有经过缓存这一层。举个例子：某个黑客故意制造我们缓存中不存在的 key 发起大量请求，导致大量请求落到数据库。
+缓存穿透说简单点就是大量请求的 key 是不合理的，**根本不存在于缓存中，也不存在于数据库中** 。这就导致这些请求直接到了数据库上，根本没有经过缓存这一层，对数据库造成了巨大的压力，可能直接就被这么多请求弄宕机了。
 
-#### 缓存穿透情况的处理流程是怎样的？
+![缓存穿透](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-cache-penetration.png)
 
-如下图所示，用户的请求最终都要跑到数据库中查询一遍。
-
-![缓存穿透情况](https://img-blog.csdnimg.cn/6358650a9bf742838441d636430c90b9.png)
+举个例子：某个黑客故意制造一些非法的 key 发起大量请求，导致大量请求落到数据库，结果数据库上也没有查到对应的数据。也就是说这些请求最终都落到了数据库上，对数据库造成了巨大的压力。
 
 #### 有哪些解决办法？
 
@@ -228,7 +279,7 @@ public Object getObjectInclNullById(Integer id) {
 
 加入布隆过滤器之后的缓存处理流程图如下。
 
-![](./images/redis-all/加入布隆过滤器后的缓存处理流程.png)
+![加入布隆过滤器之后的缓存处理流程图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-cache-penetration-bloom-filter.png)
 
 但是，需要注意的是布隆过滤器可能会存在误判的情况。总结来说就是： **布隆过滤器说某个元素存在，小概率会误判。布隆过滤器说某个元素不在，那么这个元素一定不在。**
 
@@ -248,19 +299,41 @@ _为什么会出现误判的情况呢? 我们还要从布隆过滤器的原理�
 
 更多关于布隆过滤器的内容可以看我的这篇原创：[《不了解布隆过滤器？一文给你整的明明白白！》](https://javaguide.cn/cs-basics/data-structure/bloom-filter/) ，强烈推荐，个人感觉网上应该找不到总结的这么明明白白的文章了。
 
+### 缓存击穿
+
+#### 什么是缓存击穿？
+
+缓存击穿中，请求的 key 对应的是 **热点数据** ，该数据 **存在于数据库中，但不存在于缓存中（通常是因为缓存中的那份数据已经过期）** 。这就可能会导致瞬时大量的请求直接打到了数据库上，对数据库造成了巨大的压力，可能直接就被这么多请求弄宕机了。
+
+![缓存击穿](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-cache-breakdown.png)
+
+举个例子 ：秒杀进行过程中，缓存中的某个秒杀商品的数据突然过期，这就导致瞬时大量对该商品的请求直接落到数据库上，对数据库造成了巨大的压力。
+
+#### 有哪些解决办法？
+
+- 设置热点数据永不过期或者过期时间比较长。
+- 针对热点数据提前预热，将其存入缓存中并设置合理的过期时间比如秒杀场景下的数据在秒杀结束之前不过期。
+- 请求数据库写数据到缓存之前，先获取互斥锁，保证只有一个请求会落到数据库上，减少数据库的压力。
+
+#### 缓存穿透和缓存击穿有什么区别？
+
+缓存穿透中，请求的 key 既不存在于缓存中，也不存在于数据库中。
+
+缓存击穿中，请求的 key 对应的是 **热点数据** ，该数据 **存在于数据库中，但不存在于缓存中（通常是因为缓存中的那份数据已经过期）** 。
+
 ### 缓存雪崩
 
 #### 什么是缓存雪崩？
 
 我发现缓存雪崩这名字起的有点意思，哈哈。
 
-实际上，缓存雪崩描述的就是这样一个简单的场景：**缓存在同一时间大面积的失效，后面的请求都直接落到了数据库上，造成数据库短时间内承受大量请求。** 这就好比雪崩一样，摧枯拉朽之势，数据库的压力可想而知，可能直接就被这么多请求弄宕机了。
+实际上，缓存雪崩描述的就是这样一个简单的场景：**缓存在同一时间大面积的失效，导致大量的请求都直接落到了数据库上，对数据库造成了巨大的压力。** 这就好比雪崩一样，摧枯拉朽之势，数据库的压力可想而知，可能直接就被这么多请求弄宕机了。
 
-举个例子：系统的缓存模块出了问题比如宕机导致不可用。造成系统的所有访问，都要走数据库。
+另外，缓存服务宕机也会导致缓存雪崩现象，导致所有的请求都落到了数据库上。
 
-还有一种缓存雪崩的场景是：**有一些被大量访问数据（热点缓存）在某一时刻大面积失效，导致对应的请求直接落到了数据库上。** 这样的情况，有下面几种解决办法：
+![缓存雪崩](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-cache-avalanche.png)
 
-举个例子 ：秒杀开始 12 个小时之前，我们统一存放了一批商品到 Redis 中，设置的缓存过期时间也是 12 个小时，那么秒杀开始的时候，这些秒杀的商品的访问直接就失效了。导致的情况就是，相应的请求直接就落到了数据库上，就像雪崩一样可怕。
+举个例子 ：数据库中的大量数据在同一时间过期，这个时候突然有大量的请求需要访问这些过期的数据。这就导致大量的请求直接落到数据库上，对数据库造成了巨大的压力。
 
 #### 有哪些解决办法？
 
@@ -272,7 +345,12 @@ _为什么会出现误判的情况呢? 我们还要从布隆过滤器的原理�
 **针对热点缓存失效的情况：**
 
 1. 设置不同的失效时间比如随机设置缓存的失效时间。
-2. 缓存永不失效。
+2. 缓存永不失效（不太推荐，实用性太差）。
+3. 设置二级缓存。
+
+#### 缓存雪崩和缓存击穿有什么区别？
+
+缓存雪崩和缓存击穿比较像，但缓存雪崩导致的原因是缓存中的大量或者所有数据失效，缓存击穿导致的原因主要是某个热点数据不存在与缓存中（通常是因为缓存中的那份数据已经过期）。
 
 ### 如何保证缓存和数据库数据的一致性？
 
@@ -288,6 +366,30 @@ Cache Aside Pattern 中遇到写请求是这样的：更新 DB，然后直接删
 2. **增加 cache 更新重试机制（常用）**： 如果 cache 服务当前不可用导致缓存删除失败的话，我们就隔一段时间进行重试，重试次数可以自己定。如果多次重试还是失败的话，我们可以把当前更新失败的 key 存入队列中，等缓存服务可用之后，再将缓存中对应的 key 删除即可。
 
 相关文章推荐：[缓存和数据库一致性问题，看这篇就够了 - 水滴与银弹](https://mp.weixin.qq.com/s?__biz=MzIyOTYxNDI5OA==&mid=2247487312&idx=1&sn=fa19566f5729d6598155b5c676eee62d&chksm=e8beb8e5dfc931f3e35655da9da0b61c79f2843101c130cf38996446975014f958a6481aacf1&scene=178&cur_album_id=1699766580538032128#rd)
+
+## Redis 集群
+
+**Redis Sentinel** ：
+
+1. 什么是 Sentinel？ 有什么用？
+2. Sentinel 如何检测节点是否下线？主观下线与客观下线的区别?
+3. Sentinel 是如何实现故障转移的？
+4. 为什么建议部署多个 sentinel 节点（哨兵集群）？
+5. Sentinel 如何选择出新的 master（选举机制）?
+6. 如何从 Sentinel 集群中选择出 Leader ？
+7. Sentinel 可以防止脑裂吗？
+
+**Redis Cluster** ：
+
+1. 为什么需要 Redis Cluster？解决了什么问题？有什么优势？
+2. Redis Cluster 是如何分片的？
+3. 为什么 Redis Cluster 的哈希槽是 16384 个?
+4. 如何确定给定 key 的应该分布到哪个哈希槽中？
+5. Redis Cluster 支持重新分配哈希槽吗？
+6. Redis Cluster 扩容缩容期间可以提供服务吗？
+7. Redis Cluster 中的节点是怎么进行通信的？
+
+**参考答案** ：[Redis 集群详解（付费）](redis-cluster.md)。
 
 ## 参考
 

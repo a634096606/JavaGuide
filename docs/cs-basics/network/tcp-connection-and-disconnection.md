@@ -10,7 +10,6 @@ tag:
 
 ##  建立连接-TCP 三次握手
 
-
 ![TCP 三次握手图解](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/cs-basics/network/tcp-shakes-hands-three-times.png)
 
 建立一个 TCP 连接需要“三次握手”，缺一不可 ：
@@ -29,7 +28,7 @@ tag:
 2. **第二次握手** ：Client 确认了：自己发送、接收正常，对方发送、接收正常；Server 确认了：对方发送正常，自己接收正常
 3. **第三次握手** ：Client 确认了：自己发送、接收正常，对方发送、接收正常；Server 确认了：自己发送、接收正常，对方发送、接收正常
 
-三次握手就能确认双发收发功能都正常，缺一不可。
+三次握手就能确认双方收发功能都正常，缺一不可。
 
 更详细的解答可以看这个：[TCP 为什么是三次握手，而不是两次或四次？ - 车小胖的回答 - 知乎](https://www.zhihu.com/question/24853633/answer/115173386)  。
 

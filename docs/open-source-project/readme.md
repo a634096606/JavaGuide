@@ -3,7 +3,13 @@ title: Java 开源项目精选
 category: 开源项目
 ---
 
-精选 Github 和 Gitee 上优质的 Java 开源项目，希望能够帮助到你。
+::: tip 这是一则或许对你有用的小广告
+👉 欢迎准备 Java 面试以及学习 Java 的同学加入我的[知识星球](./../about-the-author/zhishixingqiu-two-years.md)，干货很多！收费虽然是白菜价，但星球里的内容或许比你参加上万的培训班质量还要高。
+
+👉 [《Java 面试指北》](./../zhuanlan/java-mian-shi-zhi-bei.md)持续更新完善中！这是一份教你如何更高效地准备面试的小册，涵盖常见八股文（系统设计、常见框架、分布式、高并发 ......）、优质面经等内容。
+:::
+
+精选 Github 和 Gitee 上优质的 Java 开源项目.
 
 欢迎大家在项目 [issues 区](https://github.com/CodingDocs/awesome-java/issues)推荐自己认可的 Java 开源项目，让我们共同维护一个优质的 Java 开源项目精选集！
 
@@ -14,7 +20,7 @@ category: 开源项目
 
 另外，我的公众号还会定期分享优质开源项目，每一期我都会精选 5 个高质量的 Java 开源项目。
 
-目前已经更新到了第 9 期：
+目前已经更新到了第 13 期：
 
 1. [一款基于 Spring Boot + Vue 的一站式开源持续测试平台](http://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247515383&idx=1&sn=ba7244020c05d966b483d8c302d54e85&chksm=cea1f33cf9d67a2a111bcf6cadc3cc1c44828ba2302cd3e13bbd88349e43d4254808e6434133&scene=21#wechat_redirect)。
 2. [用 Java 写个沙盒塔防游戏！已上架 Steam,Apple Store](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247515981&idx=1&sn=e4b9c06af65f739bdcdf76bdc35d59f6&chksm=cea1f086f9d679908bd6604b1c42d67580160d9789951f3707ad2f5de4d97aa72121d8fe777e&token=435278690&lang=zh_CN&scene=21#wechat_redirect)
@@ -26,6 +32,9 @@ category: 开源项目
 8. [Spring Boot+MyBatis Plus+JWT 问卷系统！开源！](https://mp.weixin.qq.com/s/kRgqHt73ZJGFQ2XmKG4PXw)
 9. [手写一个简化版的 Spring Cloud！](https://mp.weixin.qq.com/s/v3FUp-keswE2EhcTaLpSMQ)
 10. [这个 SpringBoot+ Vue 开源博客系统太酷炫了！](https://mp.weixin.qq.com/s/CCzsX3Sn2Q3vhuBDEmRTlw)
+11. [手写一个简易版数据库！项目经验稳了](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2OTA0Njk0OA==&action=getalbum&album_id=1345382825083895808&scene=173&from_msgid=2247530323&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
+12. [一款强大的快速开发脚手架，前后端分离，干掉 70% 重复工作！](https://mp.weixin.qq.com/s/Ecjm801RpS34Mhj02bIOsQ)
+13. [手写一个入门级编译器！YYDS！](https://mp.weixin.qq.com/s?__biz=Mzg2OTA0Njk0OA==&mid=2247530783&idx=1&sn=c9fdc0c71e2fc95d88ba954291b07e29&chksm=cea136d4f9d6bfc2931a18a42f7bd9903503963e8a85a318adcce579614c0831b1881be3267d&token=1811572747&lang=zh_CN#rd)
 
 推荐你在我的公众号“**JavaGuide**”回复“**开源**”在线阅读[「优质开源项目推荐」](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=Mzg2OTA0Njk0OA==&action=getalbum&album_id=1345382825083895808&scene=173&from_msgid=2247516459&from_itemidx=1&count=3&nolastread=1#wechat_redirect)系列。
 

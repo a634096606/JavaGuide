@@ -127,7 +127,7 @@ HMACSHA256(
 
 在基于 JWT 进行身份验证的的应用程序中，服务器通过 Payload、Header 和 Secret(密钥)创建 JWT 并将 JWT 发送给客户端。客户端接收到 JWT 之后，会将其保存在 Cookie 或者 localStorage 里面，以后客户端发出的所有请求都会携带这个令牌。
 
-![jwt](./images/basis-of-authority-certification/jwt.png)
+![ JWT 身份验证示意图](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/system-design/jwt/jwt-authentication%20process.png)
 
 简化后的步骤如下：
 
@@ -145,7 +145,7 @@ HMACSHA256(
 
 ## 如何防止 JWT 被篡改？
 
-有了签名之后，即使 JWT 被泄露或者解惑，黑客也没办法同时篡改 Signature 、Header 、Payload。
+有了签名之后，即使 JWT 被泄露或者截获，黑客也没办法同时篡改 Signature 、Header 、Payload。
 
 这是为什么呢？因为服务端拿到 JWT 之后，会解析出其中包含的 Header、Payload 以及 Signature 。服务端会根据 Header、Payload、密钥再次生成一个 Signature。拿新生成的 Signature 和 JWT 中的 Signature 作对比，如果一样就说明 Header 和 Payload 没有被修改。
 

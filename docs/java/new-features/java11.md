@@ -7,7 +7,9 @@ tag:
 
 **Java 11** 于 2018 年 9 月 25 日正式发布，这是很重要的一个版本！Java 11 和 2017 年 9 月份发布的 Java 9 以及 2018 年 3 月份发布的 Java 10 相比，其最大的区别就是：在长期支持(Long-Term-Support)方面，**Oracle 表示会对 Java 11 提供大力支持，这一支持将会持续至 2026 年 9 月。这是据 Java 8 以后支持的首个长期版本。**
 
-![](https://img-blog.csdnimg.cn/20210603202746605.png)
+下面这张图是 Oracle 官方给出的 Oracle JDK 支持的时间线。
+
+![](https://img-blog.csdnimg.cn/4c1611fad59449edbbd6e233690e9fa7.png)
 
 **概览（精选了一部分）** ：
 
@@ -113,7 +115,7 @@ Consumer<String> consumer = (String i) -> System.out.println(i);
 
 对于 Java 初学者并希望尝试简单程序的人特别有用，并且能和 jshell 一起使用。一定能程度上增强了使用 Java 来写脚本程序的能力。
 
-## 其他
+## 其他新特性
 
 - **新的垃圾回收器 Epsilon** ：一个完全消极的 GC 实现，分配有限的内存资源，最大限度的降低内存占用和内存吞吐延迟时间
 - **低开销的 Heap Profiling** ：Java 11 中提供一种低开销的 Java 堆分配采样方法，能够得到堆分配的 Java 对象信息，并且能够通过 JVMTI 访问堆信息

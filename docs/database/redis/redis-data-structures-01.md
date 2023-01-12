@@ -12,12 +12,24 @@ head:
       content: Redis基础数据结构总结：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）
 ---
 
+Redis 共有 5 种基本数据结构：String（字符串）、List（列表）、Set（集合）、Hash（散列）、Zset（有序集合）。
+
+这 5 种数据结构是直接提供给用户使用的，是数据的保存形式，其底层实现主要依赖这 8 种数据结构：简单动态字符串（SDS）、LinkedList（双向链表）、Hash Table（哈希表）、SkipList（跳跃表）、Intset（整数集合）、ZipList（压缩列表）、QuickList（快速列表）。
+
+Redis 基本数据结构的底层数据结构实现如下：
+
+| String | List                         | Hash                | Set             | Zset              |
+| :----- | :--------------------------- | :------------------ | :-------------- | :---------------- |
+| SDS    | LinkedList/ZipList/QuickList | Hash Table、ZipList | ZipList、Intset | ZipList、SkipList |
+
+Redis 3.2 之前，List 底层实现是 LinkedList 或者 ZipList。 Redis 3.2 之后，引入了 LinkedList 和 ZipList 的结合 QuickList，List 的底层实现变为 QuickList。
+
 你可以在 Redis 官网上找到 Redis 数据结构非常详细的介绍：
 
 - [Redis Data Structures](https://redis.com/redis-enterprise/data-structures/)
 - [Redis Data types tutorial](https://redis.io/docs/manual/data-types/data-types-tutorial/)
 
-未来随着 Redis 新版本的发布，可能会有新的数据结构出现，通过查阅 Redis 官网对应的介绍，你总能获取到最靠谱的信息。 
+未来随着 Redis 新版本的发布，可能会有新的数据结构出现，通过查阅 Redis 官网对应的介绍，你总能获取到最靠谱的信息。
 
 ![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220720181630203.png)
 
@@ -144,7 +156,7 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 
 更多 Redis List 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=list 。
 
-**通过  `RPUSH/LPOP` 或者 ` LPUSH/RPOP`实现队列** ：
+**通过 `RPUSH/LPOP` 或者 `LPUSH/RPOP`实现队列** ：
 
 ```bash
 > RPUSH myList value1
@@ -172,7 +184,7 @@ Redis 中的 List 其实就是链表数据结构的实现。我在 [线性数据
 
 我专门画了一个图方便大家理解 `RPUSH` , `LPOP` , `lpush` , `RPOP` 命令：
 
-![redis list](./images/redis-all/redis-list.png)
+![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/redis-list.png)
 
 **通过 `LRANGE` 查看对应下标范围的列表元素** ：
 
@@ -233,13 +245,14 @@ Hash 类似于 JDK1.8 前的 `HashMap`，内部实现也差不多(数组 + 链�
 | HEXISTS key field                         | 查看指定哈希表中指定的字段是否存在                       |
 | HDEL key field1 field2 ...                | 删除一个或多个哈希表字段                                 |
 | HLEN key                                  | 获取指定哈希表中字段的数量                               |
+| HINCRBY key field increment               | 对指定哈希中的指定字段做运算操作（正数为加，负数为减）   |
 
 更多 Redis Hash 命令以及详细使用指南，请查看 Redis 官网对应的介绍：https://redis.io/commands/?group=hash 。
 
 **模拟对象数据存储** ：
 
 ```bash
-> HMSET userInfoKey name "guide" description "dev" age "24"
+> HMSET userInfoKey name "guide" description "dev" age 24
 OK
 > HEXISTS userInfoKey name # 查看 key 对应的 value中指定的字段是否存在。
 (integer) 1
@@ -257,6 +270,8 @@ OK
 > HSET userInfoKey name "GuideGeGe"
 > HGET userInfoKey name
 "GuideGeGe"
+> HINCRBY userInfoKey age 2
+(integer) 26
 ```
 
 ### 应用场景
@@ -353,7 +368,7 @@ Redis 中的 Set 类型是一种无序集合，集合中的元素没有先后顺
 **需要获取多个数据源交集、并集和差集的场景**
 
 - 举例 ：共同好友(交集)、共同粉丝(交集)、共同关注(交集)、好友推荐（差集）、音乐推荐（差集） 、订阅号推荐（差集+交集） 等场景。
-- 相关命令：`SINTER`（交集）、`SINTERSTORE` （交集）、`SUNION` （并集）、`SUNIONSTORE`（并集）、`SDIFF`（交集）、`SDIFFSTORE` （交集）。
+- 相关命令：`SINTER`（交集）、`SINTERSTORE` （交集）、`SUNION` （并集）、`SUNIONSTORE`（并集）、`SDIFF`（差集）、`SDIFFSTORE` （差集）。
 
 ![](https://guide-blog-images.oss-cn-shenzhen.aliyuncs.com/github/javaguide/database/redis/image-20220719074543513.png)
 
